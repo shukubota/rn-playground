@@ -1,13 +1,25 @@
-async function wait(ms: number) {
-  return new Promise((rs, _) => {
-    setTimeout(rs, ms);
-  })
-}
-async function login() {
-  await wait(1000);
-  return;
-}
+type LoginParams = {
+  email: string;
+  password: string;
+};
 
-export {
-  login,
+type LoginResponse = {
+  token: string;
+  user: {
+    email: string;
+  };
+};
+
+export async function login({ email, password }: LoginParams): Promise<LoginResponse> {
+  // API呼び出しのモック
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        token: 'mock-jwt-token',
+        user: {
+          email,
+        },
+      });
+    }, 1000);
+  });
 }

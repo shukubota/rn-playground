@@ -1,64 +1,123 @@
-import { useState } from 'react';
 import { StyleSheet, Platform, Pressable, KeyboardAvoidingView } from 'react-native';
+import { useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedTextInput } from '@/components/ThemedTextInput';
+import { useAuth } from '@/contexts/AuthContext';
+import { login } from "@/api/login";
 
-export default function LoginScreen() {
+export default function HomeScreen() {
+  const { user, signOut, setUser } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = () => {
-    console.log('submit', { email, password });
+  const handleSubmit = async () => {
+    if (isLoading) return;
+
+    setIsLoading(true);
+    try {
+      const res = await login({ email, password });
+      setUser(res.user);
+    } catch (error) {
+      console.error('Login failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  // ログイン済みの場合はプロフィール画面を表示
+  if (user) {
+    return (
+      <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <ThemedView style={styles.container}>
+          <ThemedView style={styles.contentContainer}>
+            <ThemedText type="title" style={styles.welcomeText}>
+              Welcome, {user.email}!
+            </ThemedText>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.signOutButton,
+                pressed && styles.buttonPressed,
+              ]}
+              onPress={signOut}>
+              <ThemedText style={styles.signOutButtonText}>
+                Sign Out
+              </ThemedText>
+            </Pressable>
+          </ThemedView>
+        </ThemedView>
+      </SafeAreaView>
+    );
+  }
+
+  // 未ログインの場合はログインフォームを表示
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}>
-      <ThemedView style={styles.formContainer}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title">Login</ThemedText>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoid}>
+        <ThemedView style={styles.container}>
+          <ThemedView style={styles.contentContainer}>
+            <ThemedView style={styles.titleContainer}>
+              <ThemedText type="title">Login</ThemedText>
+            </ThemedView>
+
+            <ThemedView style={styles.inputContainer}>
+              <ThemedTextInput
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                style={styles.input}
+                editable={!isLoading}
+              />
+
+              <ThemedTextInput
+                placeholder="Password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                style={styles.input}
+                editable={!isLoading}
+              />
+
+              <Pressable
+                style={({ pressed }) => [
+                  styles.submitButton,
+                  pressed && styles.buttonPressed,
+                  isLoading && styles.buttonDisabled,
+                ]}
+                onPress={handleSubmit}
+                disabled={isLoading}>
+                <ThemedText style={styles.submitButtonText}>
+                  {isLoading ? 'Logging in...' : 'Login'}
+                </ThemedText>
+              </Pressable>
+            </ThemedView>
+          </ThemedView>
         </ThemedView>
-
-        <ThemedView style={styles.inputContainer}>
-          <ThemedTextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            style={styles.input}
-          />
-
-          <ThemedTextInput
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            style={styles.input}
-          />
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.submitButton,
-              pressed && styles.submitButtonPressed,
-            ]}
-            onPress={handleSubmit}>
-            <ThemedText style={styles.submitButtonText}>Login</ThemedText>
-          </Pressable>
-        </ThemedView>
-      </ThemedView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  keyboardAvoid: {
+    flex: 1,
+  },
   container: {
     flex: 1,
   },
-  formContainer: {
+  contentContainer: {
     flex: 1,
     padding: 20,
     justifyContent: 'center',
@@ -83,12 +142,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 16,
   },
-  submitButtonPressed: {
+  signOutButton: {
+    backgroundColor: '#FF6B6B',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignSelf: 'center',
+  },
+  buttonPressed: {
     opacity: 0.8,
+  },
+  buttonDisabled: {
+    opacity: 0.5,
   },
   submitButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#000',
+  },
+  signOutButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  welcomeText: {
+    marginBottom: 20,
+    textAlign: 'center',
   },
 });
