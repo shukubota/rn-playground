@@ -1,6 +1,7 @@
 import { StyleSheet, Platform, Pressable, KeyboardAvoidingView } from 'react-native';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { WebView } from 'react-native-webview';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -14,14 +15,24 @@ export default function HomeScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const webviewRef = useRef<WebView>(null);
 
   const handleSubmit = async () => {
     if (isLoading) return;
 
     setIsLoading(true);
     try {
+      // App側のログイン
       const res = await login({ email, password });
       setUser(res.user);
+
+      // Shopify WebViewのログイン
+      const shopifyLoginJS = `
+        document.querySelector('input[name="customer[email]"]').value = '${email}';
+        document.querySelector('input[name="customer[password]"]').value = '${password}';
+        document.querySelector('form[id="customer_login"]').submit();
+      `;
+      webviewRef.current?.injectJavaScript(shopifyLoginJS);
     } catch (error) {
       console.error('Login failed:', error);
     } finally {
@@ -51,6 +62,11 @@ export default function HomeScreen() {
             </Pressable>
           </ThemedView>
         </ThemedView>
+        <ShopifyWebview
+          ref={webviewRef}
+          uri={`${SHOPIFY_STORE_URL}/account/login`}
+          style={styles.hiddenWebView}
+        />
       </SafeAreaView>
     );
   }
@@ -103,7 +119,11 @@ export default function HomeScreen() {
           </ThemedView>
         </ThemedView>
       </KeyboardAvoidingView>
-      <ShopifyWebview uri={`${SHOPIFY_STORE_URL}/account`} />
+      <ShopifyWebview
+        ref={webviewRef}
+        uri={`${SHOPIFY_STORE_URL}/account/login`}
+        style={styles.hiddenWebView}
+      />
     </SafeAreaView>
   );
 }
@@ -170,5 +190,10 @@ const styles = StyleSheet.create({
   welcomeText: {
     marginBottom: 20,
     textAlign: 'center',
+  },
+  hiddenWebView: {
+    width: 0,
+    height: 0,
+    position: 'absolute',
   },
 });
