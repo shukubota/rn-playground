@@ -5,6 +5,8 @@ type Props = {
   uri: string;
 }
 
+export const SHOPIFY_STORE_URL = 'https://bake-the-online.com';
+
 export default function ShopifyWebview(props: Props) {
   return (
     <WebView

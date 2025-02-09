@@ -7,6 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { ThemedTextInput } from '@/components/ThemedTextInput';
 import { useAuth } from '@/contexts/AuthContext';
 import { login } from "@/api/login";
+import ShopifyWebview, { SHOPIFY_STORE_URL } from "@/components/shopify";
 
 export default function HomeScreen() {
   const { user, signOut, setUser } = useAuth();
@@ -102,6 +103,7 @@ export default function HomeScreen() {
           </ThemedView>
         </ThemedView>
       </KeyboardAvoidingView>
+      <ShopifyWebview uri={`${SHOPIFY_STORE_URL}/account`} />
     </SafeAreaView>
   );
 }
