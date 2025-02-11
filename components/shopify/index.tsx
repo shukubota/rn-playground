@@ -1,6 +1,7 @@
 import { WebView } from "react-native-webview";
 import { StyleSheet } from "react-native";
 import { forwardRef } from "react";
+import {useFocusEffect} from "@react-navigation/native";
 
 type Props = {
   uri: string;
@@ -11,6 +12,14 @@ export const SHOPIFY_STORE_URL = 'https://bake-the-online.com';
 
 const ShopifyWebview = forwardRef<WebView, Props>((props, ref) => {
   const { uri, style } = props;
+
+  // useFocusEffect(() => {
+  //   if (ref && typeof ref !== 'function' && ref.current) {
+  //     setTimeout(() => {
+  //       ref.current?.reload();
+  //     }, 1000);
+  //   }
+  // });
 
   return (
     <WebView
