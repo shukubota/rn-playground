@@ -114,7 +114,7 @@ export default function HomeScreen() {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.mainContainer}>
-          <ScrollView>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
             <ThemedView style={styles.container}>
               <ThemedView style={styles.contentContainer}>
                 <ThemedText type="title" style={styles.welcomeText}>
@@ -254,6 +254,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 80, // タブバーの高さ分の余白を追加
+  },
   keyboardAvoid: {
     flex: 1,
     paddingBottom: 20,
@@ -264,7 +268,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     padding: 20,
-    justifyContent: 'center',
+    justifyContent: 'flex-start', // centerからflex-startに変更
   },
   titleContainer: {
     alignItems: 'center',
