@@ -5,11 +5,11 @@ import WebView from 'react-native-webview';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
 
-export default function HomeScreen() {
+export default function EventsScreen() {
   return (
     <ThemedView style={styles.container}>
       <WebView
-        source={{ uri: 'https://re-katsu.jp/career/' }}
+        source={{ uri: 'https://re-katsu.jp/career/event/' }}
         style={styles.webview}
         renderLoading={() => (
           <ActivityIndicator style={styles.loading} color={Colors.light.tint} />
