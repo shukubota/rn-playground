@@ -1,27 +1,41 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 
+import { Header } from '@/components/Header';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
+
+const HIDE_HEADER_SCRIPT = `
+  document.querySelector('header')?.remove();
+  true;
+`;
 
 export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
-      <WebView
-        source={{ uri: 'https://re-katsu.jp/career/' }}
-        style={styles.webview}
-        renderLoading={() => (
-          <ActivityIndicator style={styles.loading} color={Colors.light.tint} />
-        )}
-        startInLoadingState={true}
-      />
+      <Header title="Re就活" showLogo={true} />
+      <View style={styles.webviewContainer}>
+        <WebView
+          injectedJavaScript={HIDE_HEADER_SCRIPT}
+          source={{ uri: 'https://re-katsu.jp/career/' }}
+          style={styles.webview}
+          renderLoading={() => (
+            <ActivityIndicator style={styles.loading} color={Colors.light.tint} />
+          )}
+          startInLoadingState={true}
+        />
+      </View>
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  webviewContainer: {
     flex: 1,
   },
   webview: {
